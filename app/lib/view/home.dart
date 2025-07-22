@@ -14,15 +14,9 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Mouse Phone',
-          style: TextStyle(color: Color(0xFFFFFFFFF)),
-        ),
-        backgroundColor: Color(0xFF0000000),
-      ),
-      body: SingleChildScrollView(
+    return Material(
+      color: Colors.transparent,
+      child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 40),
           child: Column(
@@ -99,7 +93,7 @@ class _HomeState extends State<Home> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        InkWell(
+                        GestureDetector(
                           onTap: () => setState(() => isExpanded = !isExpanded),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
@@ -293,7 +287,6 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-      backgroundColor: Color(0xFF0000000), // Example background color
     );
   }
 }

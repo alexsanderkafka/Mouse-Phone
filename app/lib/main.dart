@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mouse_phone/view/home.dart';
+import 'package:mouse_phone/routes/bottom_navigation.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const Home(),
+      home: BottomNavigation(),
     );
   }
 }
