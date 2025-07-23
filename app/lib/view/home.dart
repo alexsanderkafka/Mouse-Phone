@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mouse_phone/view/mouse.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -181,31 +182,39 @@ class _HomeState extends State<Home> {
                 ],
               ),
               SizedBox(height: 25),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  border: Border.all(color: Color(0xFFFFFFFFF), width: 1),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  child: Row(
-                    spacing: 5,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/icons/qr_code_scan.png',
-                        width: 32,
-                        height: 32,
-                      ),
-                      Text(
-                        "Escanear QR code ",
-                        style: TextStyle(
-                          color: Color(0xFFFFFFFFF),
-                          fontSize: 14,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Mouse()),
+                  );
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    border: Border.all(color: Color(0xFFFFFFFFF), width: 1),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    child: Row(
+                      spacing: 5,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/icons/qr_code_scan.png',
+                          width: 32,
+                          height: 32,
                         ),
-                      ),
-                    ],
+                        Text(
+                          "Escanear QR code ",
+                          style: TextStyle(
+                            color: Color(0xFFFFFFFFF),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -256,7 +265,9 @@ class _HomeState extends State<Home> {
                         ],
                       ),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          // Implementar ação de
+                        },
                         child: Container(
                           decoration: BoxDecoration(
                             color: Color(0xFFFFFFFF),
