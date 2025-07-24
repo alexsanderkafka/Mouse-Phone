@@ -85,18 +85,18 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   SizedBox(height: 25),
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      border: Border.all(color: Color(0xFFFFFFFFF), width: 1),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        GestureDetector(
-                          onTap: () => setState(() => isExpanded = !isExpanded),
-                          child: Padding(
+                  GestureDetector(
+                    onTap: () => setState(() => isExpanded = !isExpanded),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        border: Border.all(color: Color(0xFFFFFFFFF), width: 1),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 16,
@@ -120,63 +120,65 @@ class _HomeState extends State<Home> {
                               ],
                             ),
                           ),
-                        ),
-                        if (isExpanded)
-                          Column(
-                            children: [
-                              Divider(color: Colors.white),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 15,
-                                ),
-                                child: TextField(
-                                  controller: _controller,
-                                  style: TextStyle(color: Colors.white),
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: Color(0xFF0000000),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      borderSide: BorderSide(
-                                        color: Colors.white,
+                          if (isExpanded)
+                            Column(
+                              children: [
+                                Divider(color: Colors.white),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 15,
+                                  ),
+                                  child: TextField(
+                                    controller: _controller,
+                                    style: TextStyle(color: Colors.white),
+                                    decoration: InputDecoration(
+                                      filled: true,
+                                      fillColor: Color(0xFF0000000),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: BorderSide(
+                                          color: Colors.white,
+                                        ),
                                       ),
-                                    ),
-                                    hintText: 'mouse://',
-                                    hintStyle: TextStyle(color: Colors.white54),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () => {},
-                                child: Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(10),
-                                      bottomRight: Radius.circular(10),
-                                    ),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 10,
-                                    ),
-                                    child: Text(
-                                      'Conectar',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
+                                      hintText: 'mouse://',
+                                      hintStyle: TextStyle(
+                                        color: Colors.white54,
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                      ],
+                                GestureDetector(
+                                  onTap: () => {},
+                                  child: Container(
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(10),
+                                        bottomRight: Radius.circular(10),
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
+                                      child: Text(
+                                        'Conectar',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -207,7 +209,7 @@ class _HomeState extends State<Home> {
                           height: 32,
                         ),
                         Text(
-                          "Escanear QR code ",
+                          "Escanear QR code",
                           style: TextStyle(
                             color: Color(0xFFFFFFFFF),
                             fontSize: 14,
