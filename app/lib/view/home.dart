@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mouse_phone/view/mouse.dart';
+//import 'package:mouse_phone/view/mouse.dart';
+import 'package:mouse_phone/view/scan_qr_code.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -186,9 +187,15 @@ class _HomeState extends State<Home> {
               SizedBox(height: 25),
               GestureDetector(
                 onTap: () {
+                  /*
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Mouse()),
+                  );*/
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ScanQRCode()),
                   );
                 },
                 child: Container(

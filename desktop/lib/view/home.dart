@@ -1,3 +1,4 @@
+import 'package:desktop/server.dart';
 import 'package:desktop/services/qrcode.dart';
 import 'package:desktop/services/system_infos.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,9 @@ class _HomeState extends State<Home> {
   bool isExpanded = false;
   String systemIp = "";
   String hostname = "";
+  final int port = 8888;
+
+  late WebSocketServer ws;
 
   //0xFF00A84
 
@@ -32,6 +36,8 @@ class _HomeState extends State<Home> {
         });
 
     hostname = SystemInfos().getHostname();
+    ws = WebSocketServer(port: port);
+    ws.init();
   }
 
   @override
@@ -261,7 +267,7 @@ class _HomeState extends State<Home> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        QrCode(systemIp, hostname).generateQrCode(),
+                        QrCode(systemIp, hostname, port).generateQrCode(),
                       ],
                     ),
                   ),

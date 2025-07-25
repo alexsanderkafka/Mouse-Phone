@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:mouse_phone/routes/bottom_navigation.dart';
+import 'package:mouse_phone/store/connection_data.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  final ConnectionData connectionData = ConnectionData();
+  runApp(
+    Provider<ConnectionData>.value(value: connectionData, child: const MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {

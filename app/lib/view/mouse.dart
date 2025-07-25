@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mouse_phone/service/web_socket.dart';
+import 'package:mouse_phone/store/connection_data.dart';
 import 'package:mouse_phone/widget/rgb_border.dart';
+import 'package:mouse_phone/routes/bottom_navigation.dart';
+
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:provider/provider.dart';
 
 class Mouse extends StatefulWidget {
   const Mouse({super.key});
@@ -9,14 +15,39 @@ class Mouse extends StatefulWidget {
 }
 
 class _MouseState extends State<Mouse> {
+  late WebSocket ws;
+
+  @override
+  void initState() {
+    super.initState();
+
+    //Conexão com o ws
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      var store = Provider.of<ConnectionData>(context, listen: false);
+
+      ws = WebSocket(ip: store.ip, port: store.port);
+      ws.initChannel();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final connectionData = Provider.of<ConnectionData>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFF000000),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            //Navigator.pop(context);
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => BottomNavigation()),
+              (Route<dynamic> route) => false,
+            );
+          },
         ),
         actions: <Widget>[
           Padding(
@@ -36,12 +67,14 @@ class _MouseState extends State<Mouse> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text(
-                      "192.168.1.1",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14.0,
-                        fontStyle: FontStyle.italic,
+                    Observer(
+                      builder: (_) => Text(
+                        connectionData.ip,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14.0,
+                          fontStyle: FontStyle.italic,
+                        ),
                       ),
                     ),
                   ],
@@ -149,6 +182,11 @@ class _MouseState extends State<Mouse> {
                 child: GestureDetector(
                   onPanUpdate: (details) {
                     print('dx: ${details.delta.dx}, dy: ${details.delta.dy}');
+                    String data =
+                        'dx: ${details.delta.dx}, dy: ${details.delta.dy}';
+
+                    ws.sendDataToWs(data);
+
                     // Handle mouse movement here
                   },
                   child: Container(
