@@ -1,8 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
+
+import 'package:desktop/app/services/mouse_control.dart';
+import 'package:desktop/dto/mouse_dto.dart';
 
 class WebSocketServer {
   final int _port;
   HttpServer? _server;
+
+  late MouseDto _mouseDto;
 
   WebSocketServer({required int port}) : _port = port;
 
@@ -14,11 +20,11 @@ class WebSocketServer {
     await for (var request in _server!) {
       if (WebSocketTransformer.isUpgradeRequest(request)) {
         await _getRequest(request);
+      } else {
+        request.response.statusCode = HttpStatus.notFound;
+
+        await request.response.close();
       }
-
-      request.response.statusCode = HttpStatus.notFound;
-
-      request.response.close();
     }
   }
 
@@ -31,8 +37,31 @@ class WebSocketServer {
 
     socket.listen(
       (data) {
-        //Entra a parte de alterar o cursos do mouse
         print("Data received: $data");
+
+        var jsonData = jsonDecode(data);
+
+        _mouseDto = MouseDto.fromJson(jsonData);
+
+        MouseControl control = MouseControl(mouse: _mouseDto);
+
+        control.moveMouse();
+
+        if (_mouseDto.left) {
+          control.leftClick();
+        }
+
+        if (_mouseDto.right) {
+          control.rightClick();
+        }
+
+        if (_mouseDto.scrollUp) {
+          control.scrollUp();
+        }
+
+        if (_mouseDto.scrollDown) {
+          control.scrollDown();
+        }
       },
       onError: (error) {
         print("Error on SocketServer: $error");

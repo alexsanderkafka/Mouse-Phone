@@ -40,7 +40,11 @@ dependencies:
   build_runner: ^2.4.9
   mobx_codegen: ^2.7.1
   provider: ^6.1.5
+  socket_io_client: ^3.1.2
+
   web_socket_channel: ^3.0.3
+
+
 
   
 

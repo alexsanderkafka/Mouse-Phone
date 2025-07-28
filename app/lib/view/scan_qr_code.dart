@@ -47,9 +47,13 @@ class _ScanQRCodeState extends State<ScanQRCode> {
 
       var json = jsonDecode(barcode.rawValue!);
 
+      print(json);
+
       connectionData.setIp(json['ip']);
       connectionData.setHostname(json['hostname']);
-      connectionData.setPort(json['port']);
+
+      print("Ip do pc: ${json['ip']}");
+      print("Ip do pc: ${json['hostname']}");
 
       Navigator.push(context, MaterialPageRoute(builder: (context) => Mouse()));
 

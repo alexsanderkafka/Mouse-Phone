@@ -11,9 +11,6 @@ abstract class ConnectionDataBase with Store {
   @observable
   String hostname = 'Nome-do-PC';
 
-  @observable
-  int port = 0;
-
   @action
   void setIp(String value) {
     ip = value;
@@ -22,10 +19,5 @@ abstract class ConnectionDataBase with Store {
   @action
   void setHostname(String value) {
     hostname = value;
-  }
-
-  @action
-  void setPort(int value) {
-    port = value;
   }
 }

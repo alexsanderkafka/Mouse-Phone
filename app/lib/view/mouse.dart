@@ -23,12 +23,18 @@ class _MouseState extends State<Mouse> {
 
     //Conexão com o ws
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       var store = Provider.of<ConnectionData>(context, listen: false);
 
-      ws = WebSocket(ip: store.ip, port: store.port);
-      ws.initChannel();
+      ws = WebSocket(ip: store.ip);
+      await ws.initChannel();
     });
+  }
+
+  @override
+  void dispose() {
+    ws.disconnect();
+    super.dispose();
   }
 
   @override
@@ -106,6 +112,17 @@ class _MouseState extends State<Mouse> {
                     child: GestureDetector(
                       onTap: () {
                         print("Left button pressed");
+                        //ws.sendDataToWs("leftButton: true");
+                        Map<String, dynamic> data = {
+                          "x": 0.0,
+                          "y": 0.0,
+                          "left": true,
+                          "right": false,
+                          "scrollUp": false,
+                          "scrollDown": false,
+                        };
+
+                        ws.sendMouseData(data);
                       },
                       child: Container(
                         height: 150,
@@ -132,6 +149,17 @@ class _MouseState extends State<Mouse> {
                     child: GestureDetector(
                       onTap: () {
                         print("Right button pressed");
+                        //ws.sendDataToWs("rifhtButton: true");
+                        Map<String, dynamic> data = {
+                          "x": 0.0,
+                          "y": 0.0,
+                          "left": false,
+                          "right": true,
+                          "scrollUp": false,
+                          "scrollDown": false,
+                        };
+
+                        ws.sendMouseData(data);
                       },
                       child: Container(
                         height: 150,
@@ -163,6 +191,17 @@ class _MouseState extends State<Mouse> {
                   child: IconButton(
                     onPressed: () {
                       print("Scroll up pressed");
+
+                      Map<String, dynamic> data = {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "left": false,
+                        "right": false,
+                        "scrollUp": true,
+                        "scrollDown": false,
+                      };
+
+                      ws.sendMouseData(data);
                     },
                     icon: Icon(Icons.arrow_upward, color: Colors.white),
                   ),
@@ -171,6 +210,17 @@ class _MouseState extends State<Mouse> {
                   child: IconButton(
                     onPressed: () {
                       print("Scroll down pressed");
+                      //ws.sendDataToWs("scrollDown: true");
+                      Map<String, dynamic> data = {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "left": false,
+                        "right": false,
+                        "scrollUp": false,
+                        "scrollDown": true,
+                      };
+
+                      ws.sendMouseData(data);
                     },
                     icon: Icon(Icons.arrow_downward, color: Colors.white),
                   ),
@@ -182,10 +232,16 @@ class _MouseState extends State<Mouse> {
                 child: GestureDetector(
                   onPanUpdate: (details) {
                     print('dx: ${details.delta.dx}, dy: ${details.delta.dy}');
-                    String data =
-                        'dx: ${details.delta.dx}, dy: ${details.delta.dy}';
+                    Map<String, dynamic> data = {
+                      "x": details.delta.dx,
+                      "y": details.delta.dy,
+                      "left": false,
+                      "right": false,
+                      "scrollUp": false,
+                      "scrollDown": false,
+                    };
 
-                    ws.sendDataToWs(data);
+                    ws.sendMouseData(data);
 
                     // Handle mouse movement here
                   },

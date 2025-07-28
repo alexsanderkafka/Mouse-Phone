@@ -6,18 +6,15 @@ import 'package:qr_flutter/qr_flutter.dart';
 class QrCode {
   String ipAddress;
   String hostname;
-  int port;
 
-  QrCode(this.ipAddress, this.hostname, this.port);
+  QrCode(this.ipAddress, this.hostname);
 
   Widget generateQrCode() {
-    Map<String, dynamic> jsonData = {
-      'ip': ipAddress,
-      'hostname': hostname,
-      'port': port,
-    };
+    Map<String, dynamic> jsonData = {'ip': ipAddress, 'hostname': hostname};
 
     final String jsonString = jsonEncode(jsonData);
+
+    print(jsonString);
 
     return QrImageView(
       data: jsonString,

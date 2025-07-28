@@ -42,24 +42,6 @@ mixin _$ConnectionData on ConnectionDataBase, Store {
     });
   }
 
-  late final _$portAtom = Atom(
-    name: 'ConnectionDataBase.port',
-    context: context,
-  );
-
-  @override
-  int get port {
-    _$portAtom.reportRead();
-    return super.port;
-  }
-
-  @override
-  set port(int value) {
-    _$portAtom.reportWrite(value, super.port, () {
-      super.port = value;
-    });
-  }
-
   late final _$ConnectionDataBaseActionController = ActionController(
     name: 'ConnectionDataBase',
     context: context,
@@ -90,23 +72,10 @@ mixin _$ConnectionData on ConnectionDataBase, Store {
   }
 
   @override
-  void setPort(int value) {
-    final _$actionInfo = _$ConnectionDataBaseActionController.startAction(
-      name: 'ConnectionDataBase.setPort',
-    );
-    try {
-      return super.setPort(value);
-    } finally {
-      _$ConnectionDataBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   String toString() {
     return '''
 ip: ${ip},
-hostname: ${hostname},
-port: ${port}
+hostname: ${hostname}
     ''';
   }
 }

@@ -1,6 +1,6 @@
-import 'package:desktop/server.dart';
-import 'package:desktop/services/qrcode.dart';
-import 'package:desktop/services/system_infos.dart';
+import 'package:desktop/server/ws_server.dart';
+import 'package:desktop/app/services/qrcode.dart';
+import 'package:desktop/app/services/system_infos.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -12,7 +12,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   bool isExpanded = false;
-  String systemIp = "";
+  String? systemIp;
   String hostname = "";
   final int port = 8888;
 
@@ -26,6 +26,7 @@ class _HomeState extends State<Home> {
     // You can call the method to get system IP here if needed
     // SystemInfos().getSystemIp();
 
+    /*
     SystemInfos()
         .getSystemIp()
         .then((ip) {
@@ -33,7 +34,14 @@ class _HomeState extends State<Home> {
         })
         .catchError((error) {
           print("Failed to get system IP: $error");
-        });
+      });*/
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      systemIp = await SystemInfos().getSystemIp();
+      print("Dentro do widget: $systemIp");
+    });
+
+    print("Fora: $systemIp");
 
     hostname = SystemInfos().getHostname();
     ws = WebSocketServer(port: port);
@@ -267,7 +275,8 @@ class _HomeState extends State<Home> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        QrCode(systemIp, hostname, port).generateQrCode(),
+                        if (systemIp != null)
+                          QrCode(systemIp!, hostname).generateQrCode(),
                       ],
                     ),
                   ),
