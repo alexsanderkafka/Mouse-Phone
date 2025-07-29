@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mouse_phone/service/web_socket.dart';
-import 'package:mouse_phone/store/connection_data.dart';
+import 'package:mouse_phone/model_view/web_socket_model_view.dart';
+import 'package:mouse_phone/service/web_socket_service.dart';
+import 'package:mouse_phone/model_view/connection_model_view.dart';
 import 'package:mouse_phone/widget/rgb_border.dart';
-import 'package:mouse_phone/routes/bottom_navigation.dart';
+import 'package:mouse_phone/navigation/bottom_navigation.dart';
 
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
@@ -15,32 +16,44 @@ class Mouse extends StatefulWidget {
 }
 
 class _MouseState extends State<Mouse> {
-  late WebSocket ws;
+  late WebSocketModelView webSocketModelView;
+
+  late ConnectionModelView connectionModelView;
 
   @override
   void initState() {
     super.initState();
 
     //Conexão com o ws
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      var store = Provider.of<ConnectionData>(context, listen: false);
+      setState(() {
+        connectionModelView = Provider.of<ConnectionModelView>(
+          context,
+          listen: false,
+        );
+      });
 
-      ws = WebSocket(ip: store.ip);
-      await ws.initChannel();
+      webSocketModelView = WebSocketModelView(
+        ws: WebSocketService(ip: connectionModelView.connectionModel.ip),
+      );
+
+      try {
+        await webSocketModelView.initConnectionWithWebSocketService();
+      } catch (e) {
+        print("Caiu em error");
+        print(e);
+      }
     });
   }
 
   @override
   void dispose() {
-    ws.disconnect();
+    webSocketModelView.disconnectWebSocketService();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final connectionData = Provider.of<ConnectionData>(context);
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFF000000),
@@ -75,7 +88,7 @@ class _MouseState extends State<Mouse> {
                     ),
                     Observer(
                       builder: (_) => Text(
-                        connectionData.ip,
+                        connectionModelView.connectionModel.ip,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 14.0,
@@ -122,7 +135,7 @@ class _MouseState extends State<Mouse> {
                           "scrollDown": false,
                         };
 
-                        ws.sendMouseData(data);
+                        webSocketModelView.sendData(data);
                       },
                       child: Container(
                         height: 150,
@@ -159,7 +172,7 @@ class _MouseState extends State<Mouse> {
                           "scrollDown": false,
                         };
 
-                        ws.sendMouseData(data);
+                        webSocketModelView.sendData(data);
                       },
                       child: Container(
                         height: 150,
@@ -201,7 +214,7 @@ class _MouseState extends State<Mouse> {
                         "scrollDown": false,
                       };
 
-                      ws.sendMouseData(data);
+                      webSocketModelView.sendData(data);
                     },
                     icon: Icon(Icons.arrow_upward, color: Colors.white),
                   ),
@@ -220,7 +233,7 @@ class _MouseState extends State<Mouse> {
                         "scrollDown": true,
                       };
 
-                      ws.sendMouseData(data);
+                      webSocketModelView.sendData(data);
                     },
                     icon: Icon(Icons.arrow_downward, color: Colors.white),
                   ),
@@ -241,9 +254,7 @@ class _MouseState extends State<Mouse> {
                       "scrollDown": false,
                     };
 
-                    ws.sendMouseData(data);
-
-                    // Handle mouse movement here
+                    webSocketModelView.sendData(data);
                   },
                   child: Container(
                     decoration: BoxDecoration(

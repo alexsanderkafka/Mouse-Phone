@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-//import 'package:mouse_phone/view/mouse.dart';
+import 'package:mouse_phone/model_view/connection_model_view.dart';
+import 'package:mouse_phone/view/mouse.dart';
 import 'package:mouse_phone/view/scan_qr_code.dart';
+import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -12,7 +14,154 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   bool isExpanded = false;
 
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _ipController = TextEditingController();
+
+  late ConnectionModelView connectionModelView;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    connectionModelView = Provider.of<ConnectionModelView>(
+      context,
+      listen: false,
+    );
+  }
+
+  void connectionEventClick() {
+    connectionModelView.setIp(_ipController.text);
+    connectionModelView.setHostname("Desktop");
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Mouse()));
+  }
+
+  void verifyIp(BuildContext context) {
+    String ip = _ipController.text;
+    String message = "";
+
+    if (ip.isEmpty) {
+      message = "Informe um IP";
+    }
+
+    //|\d{4,12})
+    final ipv4Regex = RegExp(r'^((\d{1,3}\.){3}\d{1,3}$)');
+
+    if (!ipv4Regex.hasMatch(ip)) {
+      message = "Informe um IP no formato correto. Ex: 192.168.0.1";
+    }
+
+    if (ip.contains('.')) {
+      final parts = ip.split('.');
+      if (parts.length != 4 ||
+          parts.any((part) {
+            final num = int.tryParse(part);
+            return num == null || num < 0 || num > 255;
+          })) {
+        message = 'Informe um IP no formato correto. Ex: 192.168.0.1';
+      }
+    }
+
+    if (message.isEmpty) {
+      connectionEventClick();
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 3),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  Widget hasLastConnection() {
+    if (connectionModelView.connectionModel.ip.isEmpty ||
+        connectionModelView.connectionModel.hostname.isEmpty) {
+      return Text(
+        "Nenhuma conexão anterior encontrada",
+        style: TextStyle(
+          fontSize: 18,
+          color: Color(0xFFFFFFFFF),
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          "Última conexão",
+          style: TextStyle(
+            fontSize: 18,
+            color: Color(0xFFFFFFFFF),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 10),
+        Container(
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            border: Border.all(color: Color(0xFFFFFFFFF), width: 1),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      connectionModelView.connectionModel.hostname,
+                      style: TextStyle(color: Color(0xFFFFFFFFF), fontSize: 14),
+                    ),
+                    Text(
+                      "IP: ${connectionModelView.connectionModel.ip}",
+                      style: TextStyle(
+                        color: Color(0xFFFFFFFFF),
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Mouse()),
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Color(0xFFFFFFFF),
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      border: Border.all(color: Color(0xFFFFFFFFF), width: 1),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 17,
+                        vertical: 2,
+                      ),
+                      child: Icon(
+                        Icons.compare_arrows,
+                        color: Color(0xFF0000000),
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,17 +280,28 @@ class _HomeState extends State<Home> {
                                     vertical: 15,
                                   ),
                                   child: TextField(
-                                    controller: _controller,
+                                    controller: _ipController,
+                                    cursorColor: Colors.white,
+                                    keyboardType: TextInputType.number,
                                     style: TextStyle(color: Colors.white),
                                     decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: Color(0xFF0000000),
-                                      border: OutlineInputBorder(
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.white30,
+                                          width: 2.0,
+                                        ),
                                         borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
                                           color: Colors.white,
+                                          width: 2.0,
                                         ),
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
+                                      filled: true,
+                                      fillColor: Color(0xFF0000000),
+
                                       hintText: 'mouse://',
                                       hintStyle: TextStyle(
                                         color: Colors.white54,
@@ -150,7 +310,7 @@ class _HomeState extends State<Home> {
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: () => {},
+                                  onTap: () => verifyIp(context),
                                   child: Container(
                                     width: double.infinity,
                                     decoration: BoxDecoration(
@@ -187,12 +347,6 @@ class _HomeState extends State<Home> {
               SizedBox(height: 25),
               GestureDetector(
                 onTap: () {
-                  /*
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Mouse()),
-                  );*/
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => ScanQRCode()),
@@ -228,81 +382,7 @@ class _HomeState extends State<Home> {
                 ),
               ),
               SizedBox(height: 25),
-              Text(
-                "Última conexão",
-
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Color(0xFFFFFFFFF),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  border: Border.all(color: Color(0xFFFFFFFFF), width: 1),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 15,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            "Nome-do-PC",
-                            style: TextStyle(
-                              color: Color(0xFFFFFFFFF),
-                              fontSize: 14,
-                            ),
-                          ),
-                          Text(
-                            "IP: 192.168.0.1",
-                            style: TextStyle(
-                              color: Color(0xFFFFFFFFF),
-                              fontSize: 12,
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          // Implementar ação de
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Color(0xFFFFFFFF),
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            border: Border.all(
-                              color: Color(0xFFFFFFFFF),
-                              width: 1,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 17,
-                              vertical: 2,
-                            ),
-                            child: Icon(
-                              Icons.compare_arrows,
-                              color: Color(0xFF0000000),
-                              size: 24,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              hasLastConnection(),
             ],
           ),
         ),

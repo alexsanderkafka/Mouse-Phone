@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:mouse_phone/store/connection_data.dart';
+import 'package:mouse_phone/model_view/connection_model_view.dart';
 import 'package:mouse_phone/view/mouse.dart';
 import 'package:provider/provider.dart';
 
@@ -18,14 +18,19 @@ class _ScanQRCodeState extends State<ScanQRCode> {
 
   String? alertMessage;
 
-  late ConnectionData connectionData;
+  late ConnectionModelView connectionData;
 
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      connectionData = Provider.of<ConnectionData>(context, listen: false);
+      setState(() {
+        connectionData = Provider.of<ConnectionModelView>(
+          context,
+          listen: false,
+        );
+      });
     });
   }
 
@@ -47,13 +52,8 @@ class _ScanQRCodeState extends State<ScanQRCode> {
 
       var json = jsonDecode(barcode.rawValue!);
 
-      print(json);
-
       connectionData.setIp(json['ip']);
       connectionData.setHostname(json['hostname']);
-
-      print("Ip do pc: ${json['ip']}");
-      print("Ip do pc: ${json['hostname']}");
 
       Navigator.push(context, MaterialPageRoute(builder: (context) => Mouse()));
 

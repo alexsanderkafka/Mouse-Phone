@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:mouse_phone/routes/bottom_navigation.dart';
-import 'package:mouse_phone/store/connection_data.dart';
+import 'package:mouse_phone/navigation/bottom_navigation.dart';
+import 'package:mouse_phone/model_view/connection_model_view.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  final ConnectionData connectionData = ConnectionData();
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final ConnectionModelView connectionData = ConnectionModelView();
   runApp(
-    Provider<ConnectionData>.value(value: connectionData, child: const MyApp()),
+    Provider<ConnectionModelView>.value(
+      value: connectionData,
+      child: const MyApp(),
+    ),
   );
 }
 

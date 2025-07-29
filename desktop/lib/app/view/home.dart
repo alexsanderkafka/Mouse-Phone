@@ -23,29 +23,52 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    // You can call the method to get system IP here if needed
-    // SystemInfos().getSystemIp();
-
-    /*
-    SystemInfos()
-        .getSystemIp()
-        .then((ip) {
-          systemIp = ip ?? 'IP not found';
-        })
-        .catchError((error) {
-          print("Failed to get system IP: $error");
-      });*/
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      systemIp = await SystemInfos().getSystemIp();
-      print("Dentro do widget: $systemIp");
-    });
+      final ip = await SystemInfos().getSystemIp();
 
-    print("Fora: $systemIp");
+      setState(() {
+        systemIp = ip;
+      });
+    });
 
     hostname = SystemInfos().getHostname();
     ws = WebSocketServer(port: port);
     ws.init();
+  }
+
+  Widget renderQrCode() {
+    if (systemIp == null) {
+      return CircularProgressIndicator(color: Colors.white);
+    }
+
+    return QrCode(systemIp!, hostname).generateQrCode();
+  }
+
+  Widget renderIp() {
+    if (systemIp == null) {
+      return Center(child: CircularProgressIndicator(color: Colors.white));
+    }
+
+    return Row(
+      children: [
+        Text(
+          "mouse://",
+          style: TextStyle(color: Colors.white, fontSize: 18),
+          textAlign: TextAlign.start,
+        ),
+        Text(
+          "$systemIp",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            fontStyle: FontStyle.italic,
+          ),
+          textAlign: TextAlign.start,
+        ),
+      ],
+    );
   }
 
   @override
@@ -57,46 +80,6 @@ class _HomeState extends State<Home> {
           "Mouse Phone",
           style: TextStyle(color: Color(0xFFFFFFFFF)),
         ),
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: 20.0),
-            child: Row(
-              spacing: 10,
-              children: <Widget>[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      "Conectado",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      "192.168.1.1",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14.0,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  width: 10,
-                  height: 10,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.red,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
         backgroundColor: Color(0xFF0000000),
       ),
       body: SingleChildScrollView(
@@ -222,28 +205,7 @@ class _HomeState extends State<Home> {
                                   horizontal: 10,
                                   vertical: 15,
                                 ),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      "mouse://",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                      ),
-                                      textAlign: TextAlign.start,
-                                    ),
-                                    Text(
-                                      "$systemIp",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                      textAlign: TextAlign.start,
-                                    ),
-                                  ],
-                                ),
+                                child: renderIp(),
                               ),
                             ),
                         ],
@@ -275,8 +237,7 @@ class _HomeState extends State<Home> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        if (systemIp != null)
-                          QrCode(systemIp!, hostname).generateQrCode(),
+                        renderQrCode(),
                       ],
                     ),
                   ),
