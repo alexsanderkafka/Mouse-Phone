@@ -4,18 +4,21 @@ class LocalStorage {
   final Future<SharedPreferences> _sharedPreferences =
       SharedPreferences.getInstance();
 
-  void save(key, value) {
-    _sharedPreferences.then((pref) => {pref.setString(key, value)});
+  Future<void> save(key, value) async {
+    final pref = await _sharedPreferences;
+    await pref.setString(key, value);
   }
 
   Future<String> getString(key) async {
-    String? currentValue = await _sharedPreferences.then(
-      (pref) => pref.getString(key),
-    );
+    final pref = await _sharedPreferences;
+
+    String? currentValue = pref.getString(key);
 
     if (currentValue == null) {
-      throw Exception("Value not found");
+      return "";
     }
+
+    print("Buscou os dados: $currentValue");
 
     return currentValue;
   }

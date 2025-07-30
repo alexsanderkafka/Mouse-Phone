@@ -19,8 +19,25 @@ class _HomeState extends State<Home> {
   late ConnectionModelView connectionModelView;
 
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        connectionModelView = Provider.of<ConnectionModelView>(
+          context,
+          listen: false,
+        );
+
+        connectionModelView.setConnectionModel();
+      });
+    });
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     connectionModelView = Provider.of<ConnectionModelView>(
       context,
       listen: false,

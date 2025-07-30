@@ -18,7 +18,21 @@ class MouseControl {
     final axioXCurrent = ms.getPosition().x;
     final axioYCurrent = ms.getPosition().y;
 
-    ms.moveTo(Point(axioXCurrent + mouse.x * 10, axioYCurrent + mouse.y * 10));
+    final targetPosition = Point(
+      axioXCurrent + mouse.x * 25,
+      axioYCurrent + mouse.y * 25,
+    );
+
+    final currentPosition = Point(
+      _smoothing(axioXCurrent, targetPosition.x, 0.1),
+      _smoothing(axioYCurrent, targetPosition.y, 0.1),
+    );
+
+    ms.moveTo(currentPosition);
+  }
+
+  double _smoothing(double start, double end, double t) {
+    return start + (end - start) * t;
   }
 
   void rightClick() {

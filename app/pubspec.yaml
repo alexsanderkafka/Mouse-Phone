@@ -76,6 +76,7 @@ flutter:
   assets:
     - assets/icons/mouse.png
     - assets/icons/qr_code_scan.png
+    - assets/icons/broken_link.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

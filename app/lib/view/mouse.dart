@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mouse_phone/model_view/web_socket_model_view.dart';
 import 'package:mouse_phone/service/web_socket_service.dart';
 import 'package:mouse_phone/model_view/connection_model_view.dart';
+import 'package:mouse_phone/widget/error_message.dart';
 import 'package:mouse_phone/widget/rgb_border.dart';
 import 'package:mouse_phone/navigation/bottom_navigation.dart';
 
@@ -20,30 +21,45 @@ class _MouseState extends State<Mouse> {
 
   late ConnectionModelView connectionModelView;
 
+  bool loading = true;
+  bool isError = false;
+
   @override
   void initState() {
     super.initState();
 
-    //Conexão com o ws
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         connectionModelView = Provider.of<ConnectionModelView>(
           context,
           listen: false,
         );
+
+        getWebSocket(connectionModelView.connectionModel.ip);
       });
-
-      webSocketModelView = WebSocketModelView(
-        ws: WebSocketService(ip: connectionModelView.connectionModel.ip),
-      );
-
-      try {
-        await webSocketModelView.initConnectionWithWebSocketService();
-      } catch (e) {
-        print("Caiu em error");
-        print(e);
-      }
     });
+  }
+
+  void getWebSocket(String ip) async {
+    webSocketModelView = WebSocketModelView(ws: WebSocketService(ip: ip));
+
+    try {
+      await webSocketModelView.initConnectionWithWebSocketService();
+
+      setState(() {
+        loading = false;
+      });
+    } catch (e) {
+      print("Caiu em error");
+      print("Não foi possível conectar ao servidor");
+
+      webSocketModelView.disconnectWebSocketService();
+
+      setState(() {
+        loading = false;
+        isError = true;
+      });
+    }
   }
 
   @override
@@ -54,6 +70,8 @@ class _MouseState extends State<Mouse> {
 
   @override
   Widget build(BuildContext context) {
+    ConnectionModelView modelView = Provider.of<ConnectionModelView>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFF000000),
@@ -79,7 +97,7 @@ class _MouseState extends State<Mouse> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text(
-                      "Conectado",
+                      loading || isError ? "Procurando" : "Conectado",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16.0,
@@ -88,7 +106,7 @@ class _MouseState extends State<Mouse> {
                     ),
                     Observer(
                       builder: (_) => Text(
-                        connectionModelView.connectionModel.ip,
+                        modelView.connectionModel.ip,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 14.0,
@@ -101,9 +119,9 @@ class _MouseState extends State<Mouse> {
                 Container(
                   width: 10,
                   height: 10,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color(0xFF00A843),
+                    color: loading || isError ? Colors.red : Color(0xFF00A843),
                   ),
                 ),
               ],
@@ -111,173 +129,204 @@ class _MouseState extends State<Mouse> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 40),
-        child: Column(
-          spacing: 30,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              spacing: 25,
-              children: <Widget>[
-                Expanded(
-                  child: RgbBorder(
-                    child: GestureDetector(
-                      onTap: () {
-                        print("Left button pressed");
-                        //ws.sendDataToWs("leftButton: true");
-                        Map<String, dynamic> data = {
-                          "x": 0.0,
-                          "y": 0.0,
-                          "left": true,
-                          "right": false,
-                          "scrollUp": false,
-                          "scrollDown": false,
-                        };
+      body: loading
+          ? Center(child: CircularProgressIndicator(color: Colors.white))
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 40),
+              child: isError
+                  ? ErrorMessage(
+                      message:
+                          "Não foi possível conectar ao desktop, confira o IP e tente novamente.",
+                    )
+                  : Column(
+                      spacing: 30,
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          spacing: 25,
+                          children: <Widget>[
+                            Expanded(
+                              child: RgbBorder(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    print("Left button pressed");
+                                    //ws.sendDataToWs("leftButton: true");
+                                    Map<String, dynamic> data = {
+                                      "x": 0.0,
+                                      "y": 0.0,
+                                      "left": true,
+                                      "right": false,
+                                      "scrollUp": false,
+                                      "scrollDown": false,
+                                    };
 
-                        webSocketModelView.sendData(data);
-                      },
-                      child: Container(
-                        height: 150,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                          color: Colors.black,
+                                    webSocketModelView.sendData(data);
+                                  },
+                                  child: Container(
+                                    height: 150,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(10.0),
+                                      ),
+                                      color: Colors.black,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Botão esquerdo",
+                                        style: TextStyle(
+                                          color: Color.fromARGB(
+                                            71,
+                                            255,
+                                            255,
+                                            255,
+                                          ),
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: RgbBorder(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    print("Right button pressed");
+                                    //ws.sendDataToWs("rifhtButton: true");
+                                    Map<String, dynamic> data = {
+                                      "x": 0.0,
+                                      "y": 0.0,
+                                      "left": false,
+                                      "right": true,
+                                      "scrollUp": false,
+                                      "scrollDown": false,
+                                    };
+
+                                    webSocketModelView.sendData(data);
+                                  },
+                                  child: Container(
+                                    height: 150,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(10.0),
+                                      ),
+                                      color: Colors.black,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Botão direito",
+                                        style: TextStyle(
+                                          color: Color.fromARGB(
+                                            71,
+                                            255,
+                                            255,
+                                            255,
+                                          ),
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        child: Center(
-                          child: Text(
-                            "Botão esquerdo",
-                            style: TextStyle(
-                              color: Color.fromARGB(71, 255, 255, 255),
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: 25,
+                          children: <Widget>[
+                            RgbBorder(
+                              child: IconButton(
+                                onPressed: () {
+                                  print("Scroll up pressed");
+
+                                  Map<String, dynamic> data = {
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "left": false,
+                                    "right": false,
+                                    "scrollUp": true,
+                                    "scrollDown": false,
+                                  };
+
+                                  webSocketModelView.sendData(data);
+                                },
+                                icon: Icon(
+                                  Icons.arrow_upward,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            RgbBorder(
+                              child: IconButton(
+                                onPressed: () {
+                                  print("Scroll down pressed");
+                                  //ws.sendDataToWs("scrollDown: true");
+                                  Map<String, dynamic> data = {
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "left": false,
+                                    "right": false,
+                                    "scrollUp": false,
+                                    "scrollDown": true,
+                                  };
+
+                                  webSocketModelView.sendData(data);
+                                },
+                                icon: Icon(
+                                  Icons.arrow_downward,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Expanded(
+                          child: RgbBorder(
+                            child: GestureDetector(
+                              onPanUpdate: (details) {
+                                print(
+                                  'dx: ${details.delta.dx}, dy: ${details.delta.dy}',
+                                );
+                                Map<String, dynamic> data = {
+                                  "x": details.delta.dx,
+                                  "y": details.delta.dy,
+                                  "left": false,
+                                  "right": false,
+                                  "scrollUp": false,
+                                  "scrollDown": false,
+                                };
+
+                                webSocketModelView.sendData(data);
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10.0),
+                                  ),
+                                  color: Colors.transparent,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Toque na área para mover o cursor",
+                                    style: TextStyle(
+                                      color: Color.fromARGB(71, 255, 255, 255),
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ),
-                ),
-                Expanded(
-                  child: RgbBorder(
-                    child: GestureDetector(
-                      onTap: () {
-                        print("Right button pressed");
-                        //ws.sendDataToWs("rifhtButton: true");
-                        Map<String, dynamic> data = {
-                          "x": 0.0,
-                          "y": 0.0,
-                          "left": false,
-                          "right": true,
-                          "scrollUp": false,
-                          "scrollDown": false,
-                        };
-
-                        webSocketModelView.sendData(data);
-                      },
-                      child: Container(
-                        height: 150,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                          color: Colors.black,
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Botão direito",
-                            style: TextStyle(
-                              color: Color.fromARGB(71, 255, 255, 255),
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              spacing: 25,
-              children: <Widget>[
-                RgbBorder(
-                  child: IconButton(
-                    onPressed: () {
-                      print("Scroll up pressed");
-
-                      Map<String, dynamic> data = {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "left": false,
-                        "right": false,
-                        "scrollUp": true,
-                        "scrollDown": false,
-                      };
-
-                      webSocketModelView.sendData(data);
-                    },
-                    icon: Icon(Icons.arrow_upward, color: Colors.white),
-                  ),
-                ),
-                RgbBorder(
-                  child: IconButton(
-                    onPressed: () {
-                      print("Scroll down pressed");
-                      //ws.sendDataToWs("scrollDown: true");
-                      Map<String, dynamic> data = {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "left": false,
-                        "right": false,
-                        "scrollUp": false,
-                        "scrollDown": true,
-                      };
-
-                      webSocketModelView.sendData(data);
-                    },
-                    icon: Icon(Icons.arrow_downward, color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-            Expanded(
-              child: RgbBorder(
-                child: GestureDetector(
-                  onPanUpdate: (details) {
-                    print('dx: ${details.delta.dx}, dy: ${details.delta.dy}');
-                    Map<String, dynamic> data = {
-                      "x": details.delta.dx,
-                      "y": details.delta.dy,
-                      "left": false,
-                      "right": false,
-                      "scrollUp": false,
-                      "scrollDown": false,
-                    };
-
-                    webSocketModelView.sendData(data);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                      color: Colors.transparent,
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Toque na área para mover o cursor",
-                        style: TextStyle(
-                          color: Color.fromARGB(71, 255, 255, 255),
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
       backgroundColor: Color(0xFF0000000),
     );
   }
