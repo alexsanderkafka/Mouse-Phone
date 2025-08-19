@@ -5,9 +5,13 @@
 Este projeto tem como objetivo desenvolver uma aplicação mobile e desktop. A principal funcionalidade é permitir o controle do mouse diretamente pelo aplicativo mobile, utilizando uma conexão WebSocket. A aplicação desktop é responsável por inicializar e gerenciar o servidor WebSocket, garantindo a comunicação em tempo real entre os dispositivos.
 
 ## Layout Mobile
-![mobile-1](link)
+![mobile-1](https://github.com/alexsanderkafka/Mouse-Phone/blob/main/images/app-1.jpeg)
+![mobile-2](https://github.com/alexsanderkafka/Mouse-Phone/blob/main/images/app-2.jpeg)
+![mobile-3](https://github.com/alexsanderkafka/Mouse-Phone/blob/main/images/app-3.jpeg)
+![mobile-4](https://github.com/alexsanderkafka/Mouse-Phone/blob/main/images/app-4.jpeg)
 
-## Layout Web
+## Layout Desktop
+![desktop-1](https://github.com/alexsanderkafka/Mouse-Phone/blob/main/images/desktop-1.png)
 
 
 # Tecnologias utilizadas
@@ -35,3 +39,4 @@ flutter pub get
 #rodar o projeto
 flutter run
 ```
+
