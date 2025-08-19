@@ -1,5 +1,5 @@
 ﻿# Mouse-Phone
-[![NPM]() 
+[![NPM](https://img.shields.io/npm/l/react)](https://github.com/alexsanderkafka/Mouse-Phone/blob/main/LICENSE) 
 
 # Sobre o projeto
 Este projeto tem como objetivo desenvolver uma aplicação mobile e desktop. A principal funcionalidade é permitir o controle do mouse diretamente pelo aplicativo mobile, utilizando uma conexão WebSocket. A aplicação desktop é responsável por inicializar e gerenciar o servidor WebSocket, garantindo a comunicação em tempo real entre os dispositivos.
@@ -39,4 +39,5 @@ flutter pub get
 #rodar o projeto
 flutter run
 ```
+
 
