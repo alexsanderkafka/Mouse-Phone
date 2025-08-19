@@ -26,8 +26,8 @@ Este projeto tem como objetivo desenvolver uma aplicação mobile e desktop. A p
 
 # Como executar o projeto
 Pré-requisitos: 
-- Dart 3.4.3
-- Flutter 3.22.2
+- Dart 3.8.1
+- Flutter 3.32.2
 - Emulador configurado
 
 ```bash
@@ -39,5 +39,6 @@ flutter pub get
 #rodar o projeto
 flutter run
 ```
+
 
 
